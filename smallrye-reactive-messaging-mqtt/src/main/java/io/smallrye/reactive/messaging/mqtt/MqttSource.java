@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.enterprise.inject.Instance;
 
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.ClientCustomizer;
 import io.smallrye.reactive.messaging.health.HealthReport.HealthReportBuilder;
@@ -18,9 +19,11 @@ import io.smallrye.reactive.messaging.mqtt.session.MqttClientSessionOptions;
 import io.smallrye.reactive.messaging.mqtt.session.RequestedQoS;
 import io.smallrye.reactive.messaging.providers.helpers.ConfigUtils;
 import io.smallrye.reactive.messaging.providers.helpers.VertxContext;
+import io.vertx.core.Promise;
 import io.vertx.core.internal.VertxInternal;
 import io.vertx.mutiny.core.Context;
 import io.vertx.mutiny.core.Vertx;
+import io.vertx.mutiny.mqtt.messages.MqttPublishMessage;
 
 public class MqttSource {
 
@@ -68,18 +71,19 @@ public class MqttSource {
         holder = Clients.getHolder(vertx, options, sessionCustomizers).retain(channel);
         holder.start().onSuccess(ignore -> started.set(true));
 
+        Promise<Void> subscribed = Promise.promise();
         if (hasV5SubOptions) {
-            holder.getClient()
+            subscribed.future().compose(ignored -> holder.getClient()
                     .subscribe(topic, RequestedQoS.valueOf(qos), noLocal, retainAsPublished, retainHandling,
-                            subscriptionIdentifier)
+                            subscriptionIdentifier))
                     .onFailure(outcome -> log.info("Subscription failed!"))
                     .onSuccess(outcome -> {
                         log.info("Subscription success on topic " + topic + ", Max QoS " + outcome + ".");
                         alive.set(true);
                     });
         } else {
-            holder.getClient()
-                    .subscribe(topic, RequestedQoS.valueOf(qos))
+            subscribed.future().compose(ignored -> holder.getClient()
+                    .subscribe(topic, RequestedQoS.valueOf(qos)))
                     .onFailure(outcome -> log.info("Subscription failed!"))
                     .onSuccess(outcome -> {
                         log.info("Subscription success on topic " + topic + ", Max QoS " + outcome + ".");
@@ -87,7 +91,11 @@ public class MqttSource {
                     });
         }
 
-        this.source = holder.stream()
+        this.source = Multi.createFrom().<MqttPublishMessage> publisher(subscriber -> {
+            // BroadcastProcessor registers the consumer after onSubscribe returns.
+            holder.stream().subscribe(subscriber);
+            subscribed.tryComplete();
+        })
                 .select().where(m -> MqttTopicHelper.matches(actualTopicFilter, m.topicName()))
                 .onOverflow().buffer(config.getBufferSize())
                 .emitOn(c -> VertxContext.runOnContext(root.getDelegate(), c))
