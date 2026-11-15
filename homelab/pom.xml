@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.dajudge.friday.patches</groupId>
+  <artifactId>smallrye-reactive-messaging-mqtt</artifactId>
+  <version>4.37.0-dajudge.1</version>
+  <name>SmallRye MQTT 4.37.0 with the retained-replay startup fix</name>
+  <description>Homelab backport of the consumer-before-subscription fix. Not an upstream release.</description>
+  <url>https://github.com/dajudge/smallrye-reactive-messaging</url>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://github.com/dajudge/smallrye-reactive-messaging</url>
+    <tag>homelab-mqtt-4.37.0-dajudge.1</tag>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>io.smallrye.reactive</groupId>
+      <artifactId>smallrye-reactive-messaging-provider</artifactId>
+      <version>4.37.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.smallrye.reactive</groupId>
+      <artifactId>smallrye-mutiny-vertx-mqtt</artifactId>
+      <version>3.19.1</version>
+    </dependency>
+  </dependencies>
+</project>
