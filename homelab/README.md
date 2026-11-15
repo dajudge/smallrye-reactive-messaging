@@ -13,14 +13,14 @@ also pass its JVM, retained-replay, and native integration gates before use.
 These focused tests do not replace the upstream container-based connector suite.
 
 `homelab/pom.xml` publishes the built connector as
-`com.dajudge.friday.patches:smallrye-reactive-messaging-mqtt:4.37.0-dajudge.2`.
+`com.dajudge.friday.patches:smallrye-reactive-messaging-mqtt:4.37.0-dajudge.3`.
 Its runtime dependencies remain the upstream 4.37.0 provider and 3.19.1 Vert.x
 Mutiny client; the application's Quarkus platform continues managing those
 dependencies. A distinct group avoids an enforced BOM silently selecting the
 unpatched connector. No upstream package is overwritten.
 
 After reviewing and committing the source, tag the commit
-`homelab-mqtt-4.37.0-dajudge.2`, push the branch and tag to this fork, load the
+`homelab-mqtt-4.37.0-dajudge.3`, push the branch and tag to this fork, load the
 existing Maven environment without printing it, and run `sh homelab/publish.sh`.
 The script tests and builds the module, publishes binary and source artifacts,
 and refuses to overwrite an existing release. It contains no credentials.

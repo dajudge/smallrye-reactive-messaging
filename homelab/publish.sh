@@ -10,7 +10,7 @@ case "$MAVEN_REPOSITORY_URL" in
   *) echo "Only the homelab Friday Maven repository is supported" >&2; exit 1 ;;
 esac
 [ -z "$(git status --porcelain)" ] || { echo "Publish requires a clean source commit" >&2; exit 1; }
-[ "$(git rev-parse HEAD)" = "$(git rev-parse homelab-mqtt-4.37.0-dajudge.2^{commit})" ] || {
+[ "$(git rev-parse HEAD)" = "$(git rev-parse homelab-mqtt-4.37.0-dajudge.3^{commit})" ] || {
   echo "Publish requires the exact immutable homelab release tag" >&2; exit 1;
 }
 mvn -B -ntp -pl smallrye-reactive-messaging-mqtt -am package source:jar-no-fork \
@@ -20,7 +20,7 @@ artifact=smallrye-reactive-messaging-mqtt/target/smallrye-reactive-messaging-mqt
 # Include the upstream license and the prominent backport notice in both artifacts.
 jar --update --file "$artifact.jar" -C "$root" LICENSE -C "$root" homelab/README.md
 jar --update --file "$artifact-sources.jar" -C "$root" LICENSE -C "$root" homelab/README.md
-release_path=com/dajudge/friday/patches/smallrye-reactive-messaging-mqtt/4.37.0-dajudge.2/smallrye-reactive-messaging-mqtt-4.37.0-dajudge.2.pom
+release_path=com/dajudge/friday/patches/smallrye-reactive-messaging-mqtt/4.37.0-dajudge.3/smallrye-reactive-messaging-mqtt-4.37.0-dajudge.3.pom
 code=$(curl --silent --show-error --head --user "$MAVEN_USERNAME:$MAVEN_PASSWORD" \
   --output /dev/null --write-out '%{http_code}' "${MAVEN_REPOSITORY_URL%/}/$release_path")
 [ "$code" = 404 ] || { echo "Refusing to publish: release existence check returned $code" >&2; exit 1; }

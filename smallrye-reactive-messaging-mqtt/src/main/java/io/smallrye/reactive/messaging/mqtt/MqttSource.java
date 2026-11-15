@@ -2,7 +2,6 @@ package io.smallrye.reactive.messaging.mqtt;
 
 // Homelab modification: backport consumer-before-topic-subscription ordering from
 // https://github.com/dajudge/smallrye-reactive-messaging/pull/1 (Apache-2.0).
-
 import static io.smallrye.reactive.messaging.mqtt.i18n.MqttExceptions.ex;
 import static io.smallrye.reactive.messaging.mqtt.i18n.MqttLogging.log;
 
